@@ -5,7 +5,7 @@ export default function cleanSet(set, startString) {
   const result = [];
 
   for (const value of set) {
-    if (value.startsWith(startString)) {
+    if (value.startsWith(startString) && typeof value === 'string') {
       result.push(value.slice(startString.length));
     }
   }
