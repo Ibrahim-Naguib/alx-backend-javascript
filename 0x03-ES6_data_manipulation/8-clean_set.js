@@ -2,5 +2,13 @@ export default function cleanSet(set, startString) {
   if (startString === '' || typeof startString !== 'string') {
     return '';
   }
-  return [...set].filter((item) => item.startsWith(startString)).map((item) => item.slice(startString.length)).join('-');
+  const result = [];
+
+  for (const value of set) {
+    if (value.startsWith(startString)) {
+      result.push(value.slice(startString.length));
+    }
+  }
+
+  return result.join('-');
 }
