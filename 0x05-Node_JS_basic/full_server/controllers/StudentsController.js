@@ -16,7 +16,7 @@ class StudentsController {
   }
 
   static getAllStudentsByMajor(request, response) {
-    const major = request.param.major;
+    const major = request.params.major;
     readDatabase(process.argv[2].toString()).then((students) => {
       if (!(major in students)) {
         response.status(500).send('Major parameter must be CS or SWE');
@@ -27,3 +27,5 @@ class StudentsController {
     });
   }
 }
+
+export default StudentsController;
