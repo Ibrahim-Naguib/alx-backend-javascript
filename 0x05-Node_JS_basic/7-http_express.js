@@ -1,43 +1,42 @@
 const express = require('express');
-const fs = require('fs').promises;
+const fs = require('fs');
 
-const countStudents = async (path) => {
-  try {
-    const data = await fs.readFile(path, 'utf-8');
-    const lines = data.split('\n').filter((line) => line.trim() !== '');
-    if (lines.length === 0) throw new Error('Cannot load the database');
+function countStudents(path) {
+  const fields = {};
 
-    lines.shift();
-    const students = lines.map((line) => {
-      const studentData = line.split(',');
-      return {
-        firstname: studentData[0],
-        lastname: studentData[1],
-        age: studentData[2],
-        field: studentData[3],
-      };
-    });
+  return new Promise((resolve, reject) => {
+    fs.readFile(path, (error, data) => {
+      if (error) {
+        reject(Error('Cannot load the database'));
+      } else {
+        const lines = data.toString().split('\n').filter((line) => line.trim() !== '');
+        lines.shift();
+        const students = lines.map((line) => {
+          const studentData = line.split(',');
+          return {
+            firstname: studentData[0],
+            lastname: studentData[1],
+            age: studentData[2],
+            field: studentData[3],
+          };
+        });
+        let output = `Number of students: ${students.length}\n`;
 
-    let output = `Number of students: ${students.length}\n`;
+        students.forEach((student) => {
+          if (!fields[student.field]) {
+            fields[student.field] = [];
+          }
+          fields[student.field].push(student.firstname);
+        });
 
-    const fields = {};
-
-    students.forEach((student) => {
-      if (!fields[student.field]) {
-        fields[student.field] = [];
+        for (const [field, names] of Object.entries(fields)) {
+          output += (`Number of students in ${field}: ${names.length}. List: ${names.join(', ')}\n`);
+        }
+        resolve(output.trim());
       }
-      fields[student.field].push(student.firstname);
     });
-
-    for (const [field, names] of Object.entries(fields)) {
-      output += `Number of students in ${field}: ${names.length}. List: ${names.join(', ')}\n`;
-    }
-
-    return output.trim();
-  } catch (error) {
-    throw new Error('Cannot load the database');
-  }
-};
+  });
+}
 
 const app = express();
 
@@ -50,7 +49,7 @@ app.get('/students', async (req, res) => {
   res.setHeader('Content-Type', 'text/plain');
   try {
     const studentData = await countStudents(process.argv[2]);
-    res.send(`This is the list of our students\n ${studentData}`);
+    res.send(`This is the list of our students\n${studentData}`);
   } catch (error) {
     res.send(error.message);
   }
