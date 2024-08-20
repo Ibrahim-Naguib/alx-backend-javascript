@@ -6,8 +6,8 @@ class StudentsController {
       const output = [];
       output.push('This is the list of our students');
       const keys = Object.keys(students);
-      for (let i = 0; i < keys.length; i+= 1) {
-        output.push(`Number of students in ${keys[i]}: ${students[keys[i]].length}. List: ${students[keys[i]].join(', ')}`)
+      for (let i = 0; i < keys.length; i += 1) {
+        output.push(`Number of students in ${keys[i]}: ${students[keys[i]].length}. List: ${students[keys[i]].join(', ')}`);
       }
       response.status(200).send(output.join('\n'));
     }).catch(() => {
@@ -16,7 +16,7 @@ class StudentsController {
   }
 
   static getAllStudentsByMajor(request, response) {
-    const major = request.params.major;
+    const { major } = request.params;
     readDatabase(process.argv[2].toString()).then((students) => {
       if (!(major in students)) {
         response.status(500).send('Major parameter must be CS or SWE');
